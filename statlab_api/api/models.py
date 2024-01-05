@@ -2,6 +2,7 @@ from django.db import models
 from datetime import datetime
 
 class Absence():
+
 	def __init__(self, id, subject, subjectType, classroom, teacher, start_date, end_date, justification):
 		self.id = id
 		self.subject = subject
@@ -26,3 +27,4 @@ class Absence():
 			'end_date': self.end_date,
 			'justification': self.justification
 		}
+		

@@ -11,6 +11,8 @@ router.register(r'groups', views.GroupViewSet)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls'), name='rest_framework'),
+    path('api/', include(router.urls)),
+    path('api/absences/', views.AbsenceList.as_view(), name='absence-list'),
 ]
 
 urlpatterns += router.urls

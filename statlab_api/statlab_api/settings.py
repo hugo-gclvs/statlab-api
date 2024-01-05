@@ -130,5 +130,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 import firebase_admin
 from firebase_admin import credentials
 
-cred = credentials.Certificate('chemin/vers/votre/firebase-adminsdk.json')
+cred = credentials.Certificate('./firebase-adminsdk.json')
 firebase_admin.initialize_app(cred)
