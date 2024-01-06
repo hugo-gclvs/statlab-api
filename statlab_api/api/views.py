@@ -6,7 +6,7 @@ from .models import Absence, User
 from .serializers import AbsenceSerializer, UserSerializer
 from firebase_admin import firestore
 from django.http import JsonResponse
-from .utils.firestore_utils import db, convert_document_to_dict, retrieve_absence_by_id, retrieve_absences, get_user_details
+from .utils.firestore_utils import db, convert_document_to_dict, retrieve_absence_by_id, retrieve_absences, get_user_details, retrieve_absences_by_user
 
 db = firestore.client()
 
@@ -38,15 +38,6 @@ class UserViewSet(viewsets.ModelViewSet):
         absences = retrieve_absences_by_user(pk)  # Retrieve absences from Firestore
         serializer = AbsenceSerializer(absences, many=True)  # Serialize the data
         return Response(serializer.data)
-
-def retrieve_absences_by_user(username):
-    try:
-        absences_ref = db.collection('absences').where('username', '==', username)
-        absences = absences_ref.get()
-        return [convert_document_to_dict(absence) for absence in absences]
-    except Exception as e:
-        # Handle any errors
-        pass
 
 class AbsenceViewSet(viewsets.ModelViewSet):
     serializer_class = AbsenceSerializer

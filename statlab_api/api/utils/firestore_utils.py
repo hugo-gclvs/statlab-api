@@ -53,6 +53,15 @@ def retrieve_absence_by_id(id):
     except Exception as e:
         # Handle any errors
         pass
+    
+def retrieve_absences_by_user(username):
+    try:
+        absences_ref = db.collection('absences').where('username', '==', username)
+        absences = absences_ref.get()
+        return [convert_document_to_dict(absence) for absence in absences]
+    except Exception as e:
+        # Handle any errors
+        pass
 
 def retrieve_absences():
     try:
