@@ -90,9 +90,13 @@ def convertir_document_en_dict(document):
     dict_document['id'] = document.id
 
     # Convertir les DocumentReference en ID
-    for key, value in dict_document.items():
+    for key, value in list(dict_document.items()):
         if isinstance(value, firestore.DocumentReference):
-            dict_document[key] = value.id
+            if key == 'username':
+                user_details = get_user_details(value)
+                dict_document[key] = user_details.get('username') if user_details else None
+            else:
+                dict_document[key] = value.id
 
     # Convertir les dates
     for key, value in dict_document.items():
@@ -110,14 +114,8 @@ def recuperer_absences():
         # Handle any errors
         pass
 
-def get_user_details(username):
-    user_ref = db.collection('users').document(username)
-    user = user_ref.get()
-    if user.exists:
-        return user.to_dict()
+def get_user_details(user_ref):
+    user_doc = user_ref.get()
+    if user_doc.exists:
+        return user_doc.to_dict()
     return None
-
-
-def afficher_absences(request):
-    absences = recuperer_absences()
-    return JsonResponse({'absences': absences}, safe=False)

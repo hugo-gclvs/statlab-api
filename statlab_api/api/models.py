@@ -1,5 +1,12 @@
 from django.db import models
 
+class User(models.Model):
+    username = models.CharField(max_length=100)
+
+    def to_dict(self):
+        return {
+            'username': self.username
+        }
 
 class Absence(models.Model):
     subject = models.CharField(max_length=100)
@@ -23,10 +30,3 @@ class Absence(models.Model):
             'username': self.username,
         }
 
-class User(models.Model):
-    username = models.CharField(max_length=100)
-
-    def to_dict(self):
-        return {
-            'username': self.username
-        }
