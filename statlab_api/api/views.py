@@ -53,6 +53,7 @@ class AbsenceViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         absences = recuperer_absences()  # Récupérer les absences de Firestore
+        print(absences)
         serializer = AbsenceSerializer(absences, many=True)  # Sérialiser les données
         return Response(serializer.data) 
 
@@ -90,18 +91,27 @@ def convertir_document_en_dict(document):
     dict_document['id'] = document.id
 
     # Convertir les DocumentReference en ID
-    for key, value in list(dict_document.items()):
-        if isinstance(value, firestore.DocumentReference):
-            if key == 'username':
-                user_details = get_user_details(value)
-                dict_document[key] = user_details.get('username') if user_details else None
-            else:
-                dict_document[key] = value.id
+    user_ref = dict_document.get('username') or dict_document.get('users')
+    if isinstance(user_ref, firestore.DocumentReference):
+        user_details = get_user_details(user_ref)
+        dict_document['username'] = user_details.get('username') if user_details else None
+    else:
+        dict_document['username'] = user_ref if user_ref else None
+
+    # Gérer la référence 'subjectType'
+    subject_type_ref = dict_document.get('subjectType')
+    if isinstance(subject_type_ref, firestore.DocumentReference):
+        subject_type_details = get_subject_type_details(subject_type_ref)
+        dict_document['subjectType'] = subject_type_details.get('type') if user_details else None
+    else:
+        dict_document['subjectType'] = subject_type_ref if subject_type_ref else None
+
 
     # Convertir les dates
     for key, value in dict_document.items():
         if isinstance(value, datetime.datetime):
             dict_document[key] = value.isoformat()
+
 
     return dict_document
 
@@ -118,4 +128,10 @@ def get_user_details(user_ref):
     user_doc = user_ref.get()
     if user_doc.exists:
         return user_doc.to_dict()
+    return None
+
+def get_subject_type_details(subject_type_ref):
+    subject_type_doc = subject_type_ref.get()
+    if subject_type_doc.exists:
+        return subject_type_doc.to_dict()
     return None
