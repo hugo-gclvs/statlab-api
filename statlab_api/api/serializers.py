@@ -20,7 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
 class AbsenceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Absence
-        fields = ('subject', 'subjectType', 'classroom', 'teacher', 'start_date', 'end_date', 'justification', 'username',)
+        fields = ('id', 'subject', 'subjectType', 'classroom', 'teacher', 'start_date', 'end_date', 'justification', 'username')
 
 
     def create(self, validated_data):

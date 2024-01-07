@@ -45,7 +45,9 @@ class AbsenceViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         absences = retrieve_absences()  # Retrieve absences from Firestore
+        # print(absences)
         serializer = AbsenceSerializer(absences, many=True)  # Serialize the data
+        print(serializer.data)
         return Response(serializer.data) 
 
     def create(self, request):

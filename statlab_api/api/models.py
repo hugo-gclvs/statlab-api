@@ -9,6 +9,7 @@ class User(models.Model):
         }
 
 class Absence(models.Model):
+    id = models.CharField(max_length=100, primary_key=True)
     subject = models.CharField(max_length=100)
     subjectType = models.CharField(max_length=100)
     classroom = models.CharField(max_length=100)
@@ -20,6 +21,7 @@ class Absence(models.Model):
 
     def to_dict(self):
         return {
+            'id': self.id,
             'subject': self.subject,
             'subjectType': self.subjectType,
             'classroom': self.classroom,
