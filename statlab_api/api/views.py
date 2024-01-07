@@ -2,11 +2,14 @@ import datetime
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets
+from rest_framework import status
+from rest_framework.views import APIView
 from .models import Absence, User
 from .serializers import AbsenceSerializer, UserSerializer
 from firebase_admin import firestore
 from django.http import JsonResponse
 from .utils.firestore_utils import db, convert_document_to_dict, retrieve_absence_by_id, retrieve_absences, get_user_details, retrieve_absences_by_user
+from services.session_manager import SessionManager
 
 db = firestore.client()
 
@@ -45,9 +48,7 @@ class AbsenceViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         absences = retrieve_absences()  # Retrieve absences from Firestore
-        # print(absences)
         serializer = AbsenceSerializer(absences, many=True)  # Serialize the data
-        print(serializer.data)
         return Response(serializer.data) 
 
     def create(self, request):
@@ -68,3 +69,35 @@ class AbsenceViewSet(viewsets.ModelViewSet):
     def destroy(self, request, pk=None):
         # Logic to delete an absence from Firestore
         return Response({'message': 'Absence successfully deleted!'})
+
+class LoginView(APIView):
+    def post(self, request, *args, **kwargs):
+        username = request.data.get("username")
+        password = request.data.get("password")
+
+        if not username or not password:
+            return Response({"error": "Both username and password are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+        if user_is_valid(username, password): 
+            # check if user exists in firestore
+            user = db.collection('users').where('username', '==', username).get()
+            if len(user) > 0:
+                return Response({"message": "Login successful"})
+            # if not, create a new user
+            user_ref = db.collection('users').document()
+            user_ref.set({"username": username})
+            
+            return Response({"message": "Login successful"})
+        else:
+            return Response({"error": "Invalid login credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+
+def user_is_valid(username, password):
+    session_manager = SessionManager(user=username, pwd=password)
+
+    if session_manager.login():
+        return True
+    else:
+        return False
