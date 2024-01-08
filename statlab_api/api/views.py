@@ -74,6 +74,8 @@ class LoginView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = CustomTokenObtainPairSerializer(data=request.data)
 
+        
+
         if serializer.is_valid():
             return Response(serializer.validated_data)
         else:

@@ -3,6 +3,9 @@ from rest_framework import serializers
 from api.models import Absence, User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from services.session_manager import SessionManager
+from services.oge_scraper import OgeScraper
+from services.absence_service import AbsenceService
+
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -69,6 +72,40 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             user = {"username": username}
         else:
             user = convert_document_to_dict(user_query[0])
+
+        # Scrapper les informations de l'utilisateur avec OGEScrapper
+        session_manager = SessionManager(user=username, pwd=password)
+        session_manager.login()
+        oge_scraper = OgeScraper(session_manager)
+        absence_service = AbsenceService(oge_scraper)
+
+        # Récupérer les absences de l'utilisateur sur OGEScrapper
+        absences = absence_service.getAllAbsences()
+        absences = [absence.to_dict() for absence in absences]
+        
+        # remove id from dict
+        for absence in absences:
+            del absence['id']
+        # get the reference to the user
+        user_ref = db.collection('users').where('username', '==', username).get()[0].reference
+        # add the reference to the user to each absence
+        for absence in absences:
+            absence['username'] = user_ref
+        # for each absences get the reference to the subject type
+        for absence in absences:
+            if absence['subjectType'] == 'CM':
+                absence['subjectType'] = '/subject_type/CM'
+            elif absence['subjectType'] == 'TD':
+                absence['subjectType'] = '/subject_type/TD'
+            elif absence['subjectType'] == 'TP':
+                absence['subjectType'] = '/subject_type/TP'
+            elif absence['subjectType'] == 'Projet':
+                absence['subjectType'] = '/subject_type/Projet'
+
+        # Créer les absences dans Firestore
+        for absence in absences:
+            absence_ref = db.collection('absences').document()
+            absence_ref.set(absence)
 
         # Créer les jetons
         refresh = self.get_token(user)
