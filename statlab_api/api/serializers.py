@@ -1,4 +1,4 @@
-from .utils.firestore_utils import db
+from .utils.firestore_utils import convert_document_to_dict, db
 from rest_framework import serializers
 from api.models import Absence, User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -48,34 +48,32 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         # Créez un jeton de rafraîchissement avec des informations utilisateur supplémentaires ici si nécessaire
-        token = RefreshToken.for_user(user)
+        token = RefreshToken()
         # Ajoutez des informations personnalisées au jeton ici, si nécessaire
-        token['username'] = user.username
+        token['username'] = user['username']
         return token
 
     def validate(self, attrs):
-        # Ici, vous pouvez intégrer votre logique personnalisée pour valider les utilisateurs.
-        # Par exemple, vérifiez si l'utilisateur existe dans Firestore.
         username = attrs.get('username')
         password = attrs.get('password')
 
-        if not user_is_valid(username, password):  # Votre fonction de validation personnalisée
+        # Logique de validation de l'utilisateur
+        if not user_is_valid(username, password):
             raise AuthenticationFailed('No active account found with the given credentials')
 
-        user = db.collection('users').where('username', '==', username).get()
-        if len(user) == 0:
-            # Si non, créez un nouvel utilisateur
+        # Récupérer ou créer l'utilisateur dans Firestore
+        user_query = db.collection('users').where('username', '==', username).get()
+        if len(user_query) == 0:
             user_ref = db.collection('users').document()
             user_ref.set({"username": username})
+            user = {"username": username}
+        else:
+            user = convert_document_to_dict(user_query[0])
 
-
-        print(user.username)
-
+        # Créer les jetons
         refresh = self.get_token(user)
 
-        data = {}
-        data['refresh'] = str(refresh)
-        data['access'] = str(refresh.access_token)
+        data = {'refresh': str(refresh), 'access': str(refresh.access_token)}
 
         return data
     
