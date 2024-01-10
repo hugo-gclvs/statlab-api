@@ -2,11 +2,14 @@ import datetime
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets
+from rest_framework import status
+from rest_framework.views import APIView
 from .models import Absence, User
-from .serializers import AbsenceSerializer, UserSerializer
+from .serializers import AbsenceSerializer, UserSerializer, CustomTokenObtainPairSerializer
 from firebase_admin import firestore
 from django.http import JsonResponse
 from .utils.firestore_utils import db, convert_document_to_dict, retrieve_absence_by_id, retrieve_absences, get_user_details, retrieve_absences_by_user
+
 
 db = firestore.client()
 
@@ -45,9 +48,7 @@ class AbsenceViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         absences = retrieve_absences()  # Retrieve absences from Firestore
-        # print(absences)
         serializer = AbsenceSerializer(absences, many=True)  # Serialize the data
-        print(serializer.data)
         return Response(serializer.data) 
 
     def create(self, request):
@@ -68,3 +69,14 @@ class AbsenceViewSet(viewsets.ModelViewSet):
     def destroy(self, request, pk=None):
         # Logic to delete an absence from Firestore
         return Response({'message': 'Absence successfully deleted!'})
+
+class LoginView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = CustomTokenObtainPairSerializer(data=request.data)
+
+        if serializer.is_valid():
+            return Response(serializer.validated_data)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+

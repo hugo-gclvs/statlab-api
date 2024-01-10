@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'api'
+    'api',
+    'rest_framework_simplejwt',
 ]
 
 MIDDLEWARE = [
@@ -130,6 +131,21 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 import firebase_admin
 from firebase_admin import credentials
+from datetime import timedelta
 
 cred = credentials.Certificate('./firebase-adminsdk.json')
 firebase_admin.initialize_app(cred)
+
+
+REST_FRAMEWORK = {
+    # ...
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    # ...
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # Durée de vie du jeton
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # Durée de vie du jeton de rafraîchissement
+}
