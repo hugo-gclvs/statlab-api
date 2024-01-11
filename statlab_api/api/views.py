@@ -79,11 +79,7 @@ class LoginView(APIView):
         if serializer.is_valid():
             return Response(serializer.validated_data)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-import logging
-
-logger = logging.getLogger(__name__)      
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)   
 
 class UserAbsencesView(APIView):
     permission_classes = [IsAuthenticated]
