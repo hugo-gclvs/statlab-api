@@ -51,7 +51,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = RefreshToken()
-        token['username'] = user['username']
+        token['username_id'] = user['id']
         return token
 
     def validate(self, attrs):
