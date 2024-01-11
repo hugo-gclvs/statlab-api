@@ -140,12 +140,12 @@ firebase_admin.initialize_app(cred)
 REST_FRAMEWORK = {
     # ...
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'api.authentication.CustomJWTAuthentication',
     ),
     # ...
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # Durée de vie du jeton
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=50),  # Durée de vie du jeton
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # Durée de vie du jeton de rafraîchissement
 }

@@ -9,6 +9,7 @@ from .models import Absence, User
 from .serializers import AbsenceSerializer, UserSerializer, CustomTokenObtainPairSerializer
 from firebase_admin import firestore
 from django.http import JsonResponse
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from .utils.firestore_utils import db, convert_document_to_dict, retrieve_absence_by_id, retrieve_absences, get_user_details, retrieve_absences_by_user
 
 
@@ -79,17 +80,31 @@ class LoginView(APIView):
             return Response(serializer.validated_data)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
+import logging
+
+logger = logging.getLogger(__name__)      
 
 class UserAbsencesView(APIView):
     permission_classes = [IsAuthenticated]
 
-#     def get(self, request, username):
-#         username = request.user.username
-#         user_absences = self.get_user_absences(username)
-#         return Response(user_absences)
+    def get(self, request, *args, **kwargs):
+        # Get JWT from Authorization header
+        raw_token = request.headers.get('Authorization').split()[1]
+        validated_token = JWTAuthentication().get_validated_token(raw_token)
+        user_id = validated_token.get('user_id')
 
-#     def get_user_absences(self, username):
-#         absences = retrieve_absences_by_user(username)
-#         serializer = AbsenceSerializer(absences, many=True)
-#         return serializer.data
+        print(user_id)
+        absences = self.get_user_absences(user_id)
+        return Response({"absences": absences})
+
+    def get_user_absences(self, user_id):
+        user_ref = db.collection('users').document(user_id)
+        absences_query = db.collection('absences').where('username', '==', user_ref).get()
+
+        print(absences_query)
+
+        # Convert the documents returned by the query into a dictionary
+        absences = [convert_document_to_dict(absence) for absence in absences_query]
+        return absences
+
