@@ -15,35 +15,10 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('username',)
 
-    def create(self, validated_data):
-        # Logique pour créer un utilisateur dans Firestore
-        # Retournez le dictionnaire de l'utilisateur créé
-        pass
-
-    def update(self, instance, validated_data):
-        # Logique pour mettre à jour un utilisateur dans Firestore
-        # Retournez le dictionnaire de l'utilisateur mis à jour
-        pass
-
 class AbsenceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Absence
         fields = ('id', 'subject', 'subjectType', 'classroom', 'teacher', 'start_date', 'end_date', 'justification', 'username')
-
-
-    def create(self, validated_data):
-        # Logique pour créer une absence dans Firestore
-
-
-        # Retournez le dictionnaire de l'absence créée
-        pass
-
-    def update(self, instance, validated_data):
-        # Logique pour mettre à jour une absence dans Firestore
-
-
-        # Retournez le dictionnaire de l'absence mise à jour
-        pass
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -51,7 +26,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = RefreshToken()
-        token['username'] = user['username']
+        print(user['id'])
+        token['user_id'] = user['id']
         return token
 
     def validate(self, attrs):

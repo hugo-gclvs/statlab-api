@@ -138,11 +138,9 @@ firebase_admin.initialize_app(cred)
 
 
 REST_FRAMEWORK = {
-    # ...
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'api.authentication.CustomJWTAuthentication',
     ),
-    # ...
 }
 
 SIMPLE_JWT = {
