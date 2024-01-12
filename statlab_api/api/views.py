@@ -3,7 +3,6 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from .serializers import CustomTokenObtainPairSerializer
-from firebase_admin import firestore
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .utils.firestore_utils import get_user_absences, get_filtered_user_absences
 
