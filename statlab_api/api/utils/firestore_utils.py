@@ -44,30 +44,27 @@ def convert_document_to_dict(document):
 
     return dict_document
 
-
-def retrieve_absence_by_id(id):
-    try:
-        absence_ref = db.collection('absences').document(id)
-        absence = absence_ref.get()
-        return convert_document_to_dict(absence)
-    except Exception as e:
-        # Handle any errors
-        pass
-    
-def retrieve_absences_by_user(user_id):
-    try:
+def get_filtered_user_absences(user_id, teacher_name, classroom):
+        """
+        Get filtered absences for a user from Firestore based on query parameters.
+        """
         user_ref = db.collection('users').document(user_id)
-        absences = db.collection('absences').where('username', '==', user_ref).get()
-        return [convert_document_to_dict(absence) for absence in absences]
-    except Exception as e:
-        # Handle any errors
-        pass
+        query = db.collection('absences').where('username', '==', user_ref)
 
-def retrieve_absences():
-    try:
-        absences_ref = db.collection('absences')
-        absences = absences_ref.get()
-        return [convert_document_to_dict(absence) for absence in absences]
-    except Exception as e:
-        # Handle any errors
-        pass
+        if teacher_name:
+            query = query.where('teacher', '==', teacher_name)
+        if classroom:
+            query = query.where('classroom', '==', classroom)
+
+        absences_query = query.get()
+        absences = [convert_document_to_dict(absence) for absence in absences_query]
+        return absences
+
+def get_user_absences(user_id):
+        """
+        Get absences for a user from Firestore.
+        """
+        user_ref = db.collection('users').document(user_id)
+        absences_query = db.collection('absences').where('username', '==', user_ref).get()
+        absences = [convert_document_to_dict(absence) for absence in absences_query]
+        return absences
