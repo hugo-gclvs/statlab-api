@@ -38,7 +38,7 @@ def convert_document_to_dict(document):
 
     return dict_document
 
-def query_absences(user_id, teacher_name=None, classroom=None):
+def query_absences(user_id, teacher_name=None, classroom=None, subjectType=None):
     """
     Query absences for a user, optionally filtered by teacher name and classroom.
     """
@@ -50,6 +50,8 @@ def query_absences(user_id, teacher_name=None, classroom=None):
             query = query.where('teacher', '==', teacher_name)
         if classroom:
             query = query.where('classroom', '==', classroom)
+        if subjectType:
+            query = query.where('subjectType', '==', "/subject_type/"+subjectType)
 
         absences_query = query.get()
         return [convert_document_to_dict(absence) for absence in absences_query if absence.exists]

@@ -38,8 +38,9 @@ class FilteredAbsencesView(BaseAuthenticatedView):
             user_id = self.get_user_id_from_token(request)
             teacher_name = request.query_params.get('teacher')
             classroom = request.query_params.get('classroom')
+            subjectType = request.query_params.get('subjectType')
 
-            absences = get_filtered_user_absences(user_id, teacher_name, classroom)
+            absences = get_filtered_user_absences(user_id, teacher_name, classroom, subjectType)
             return Response({"absences": absences})
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
