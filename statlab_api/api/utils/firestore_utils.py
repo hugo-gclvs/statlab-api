@@ -38,9 +38,9 @@ def convert_document_to_dict(document):
 
     return dict_document
 
-def query_absences(user_id, teacher_name=None, classroom=None, subjectType=None):
+def query_absences(user_id, teacher_name=None, classroom=None, subjectType=None, subject=None):
     """
-    Query absences for a user, optionally filtered by teacher name and classroom.
+    Query absences for a user, optionally filtered by teacher name, classroom, subject type and subject.
     """
     try:
         user_ref = db.collection('users').document(user_id)
@@ -52,6 +52,8 @@ def query_absences(user_id, teacher_name=None, classroom=None, subjectType=None)
             query = query.where('classroom', '==', classroom)
         if subjectType:
             query = query.where('subjectType', '==', "/subject_type/"+subjectType)
+        if subject:
+            query = query.where('subject', '==', subject)
 
         absences_query = query.get()
         return [convert_document_to_dict(absence) for absence in absences_query if absence.exists]
