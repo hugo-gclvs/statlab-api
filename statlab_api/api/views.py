@@ -5,10 +5,8 @@ from rest_framework.views import APIView
 from .serializers import CustomTokenObtainPairSerializer
 from firebase_admin import firestore
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from .utils.firestore_utils import db, convert_document_to_dict, get_user_absences, get_filtered_user_absences
+from .utils.firestore_utils import get_user_absences, get_filtered_user_absences
 
-# Initialize Firestore client
-db = firestore.client()
 
 class BaseAuthenticatedView(APIView):
     permission_classes = [IsAuthenticated]
