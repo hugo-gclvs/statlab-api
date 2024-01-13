@@ -65,9 +65,9 @@ def query_absences(user_id, teacher_name=None, classroom=None, subjectType=None,
         print(f"Error querying absences: {e}")
         return []
     
-def get_top_10_users_with_most_absences_from_firestore():
+def get_top_users_with_most_absences_from_firestore(top_n):
     """
-    Retrieve the top 10 users with the highest number of absences from Firestore.
+    Retrieve the top n users with the highest number of absences from Firestore.
     """
     try:
         absences_count = defaultdict(int)
@@ -78,7 +78,7 @@ def get_top_10_users_with_most_absences_from_firestore():
             if user_ref:
                 absences_count[user_ref.id] += 1
 
-        top_10_user_ids = sorted(absences_count, key=absences_count.get, reverse=True)[:10]
+        top_10_user_ids = sorted(absences_count, key=absences_count.get, reverse=True)[:top_n]
 
         return [
             db.collection('users').document(user_id).get().to_dict().get('username')
@@ -89,9 +89,9 @@ def get_top_10_users_with_most_absences_from_firestore():
         print(f"Error retrieving top 10 users with most absences: {e}")
 
 
-def get_top_10_users_with_most_absences_by_teacher_from_firestore(teacher_name):
+def get_top_users_with_most_absences_by_teacher_from_firestore(teacher_name, top_n):
     """
-    Retrieve the top 10 users with the highest number of absences by teacher from Firestore.
+    Retrieve the top n users with the highest number of absences by teacher from Firestore.
     """
     try:
         absences_count = defaultdict(int)
@@ -102,7 +102,7 @@ def get_top_10_users_with_most_absences_by_teacher_from_firestore(teacher_name):
             if user_ref:
                 absences_count[user_ref.id] += 1
 
-        top_10_user_ids = sorted(absences_count, key=absences_count.get, reverse=True)[:10]
+        top_10_user_ids = sorted(absences_count, key=absences_count.get, reverse=True)[:top_n]
 
         return [
             db.collection('users').document(user_id).get().to_dict().get('username')
@@ -113,9 +113,9 @@ def get_top_10_users_with_most_absences_by_teacher_from_firestore(teacher_name):
         print(f"Error retrieving top 10 users with most absences by teacher: {e}")
 
 
-def get_top_10_users_with_most_absences_by_classroom_from_firestore(classroom):
+def get_top_users_with_most_absences_by_classroom_from_firestore(classroom, top_n):
     """
-    Retrieve the top 10 users with the highest number of absences by classroom from Firestore.
+    Retrieve the top n users with the highest number of absences by classroom from Firestore.
     """
     try:
         absences_count = defaultdict(int)
@@ -126,7 +126,7 @@ def get_top_10_users_with_most_absences_by_classroom_from_firestore(classroom):
             if user_ref:
                 absences_count[user_ref.id] += 1
 
-        top_10_user_ids = sorted(absences_count, key=absences_count.get, reverse=True)[:10]
+        top_10_user_ids = sorted(absences_count, key=absences_count.get, reverse=True)[:top_n]
 
         return [
             db.collection('users').document(user_id).get().to_dict().get('username')
@@ -137,9 +137,9 @@ def get_top_10_users_with_most_absences_by_classroom_from_firestore(classroom):
         print(f"Error retrieving top 10 users with most absences by classroom: {e}")
 
 
-def get_top_10_users_with_most_absences_by_subject_from_firestore(subject):
+def get_top_users_with_most_absences_by_subject_from_firestore(subject, top_n):
     """
-    Retrieve the top 10 users with the highest number of absences by subject from Firestore.
+    Retrieve the top n users with the highest number of absences by subject from Firestore.
     """
     try:
         absences_count = defaultdict(int)
@@ -150,7 +150,7 @@ def get_top_10_users_with_most_absences_by_subject_from_firestore(subject):
             if user_ref:
                 absences_count[user_ref.id] += 1
 
-        top_10_user_ids = sorted(absences_count, key=absences_count.get, reverse=True)[:10]
+        top_10_user_ids = sorted(absences_count, key=absences_count.get, reverse=True)[:top_n]
 
         return [
             db.collection('users').document(user_id).get().to_dict().get('username')
@@ -160,9 +160,9 @@ def get_top_10_users_with_most_absences_by_subject_from_firestore(subject):
     except Exception as e:
         print(f"Error retrieving top 10 users with most absences by subject: {e}")
 
-def get_top_10_users_with_most_absences_by_subject_type_from_firestore(subject_type):
+def get_top_users_with_most_absences_by_subject_type_from_firestore(subject_type, top_n):
     """
-    Retrieve the top 10 users with the highest number of absences by subject type from Firestore.
+    Retrieve the top n users with the highest number of absences by subject type from Firestore.
     """
     try:
         absences_count = defaultdict(int)
@@ -173,7 +173,7 @@ def get_top_10_users_with_most_absences_by_subject_type_from_firestore(subject_t
             if user_ref:
                 absences_count[user_ref.id] += 1
 
-        top_10_user_ids = sorted(absences_count, key=absences_count.get, reverse=True)[:10]
+        top_10_user_ids = sorted(absences_count, key=absences_count.get, reverse=True)[:top_n]
 
         return [
             db.collection('users').document(user_id).get().to_dict().get('username')
@@ -184,9 +184,9 @@ def get_top_10_users_with_most_absences_by_subject_type_from_firestore(subject_t
         print(f"Error retrieving top 10 users with most absences by subject type: {e}")
 
 
-def get_top_10_users_with_most_absences_by_justification_from_firestore(justification):
+def get_top_users_with_most_absences_by_justification_from_firestore(justification, top_n):
     """
-    Retrieve the top 10 users with the highest number of absences by justification from Firestore.
+    Retrieve the top n users with the highest number of absences by justification from Firestore.
     """
     try:
         absences_count = defaultdict(int)
@@ -197,7 +197,7 @@ def get_top_10_users_with_most_absences_by_justification_from_firestore(justific
             if user_ref:
                 absences_count[user_ref.id] += 1
 
-        top_10_user_ids = sorted(absences_count, key=absences_count.get, reverse=True)[:10]
+        top_10_user_ids = sorted(absences_count, key=absences_count.get, reverse=True)[:top_n]
 
         return [
             db.collection('users').document(user_id).get().to_dict().get('username')
