@@ -1,3 +1,4 @@
+from collections import defaultdict
 import datetime
 from firebase_admin import firestore
 from google.cloud.firestore_v1.base_query import FieldFilter
@@ -63,6 +64,30 @@ def query_absences(user_id, teacher_name=None, classroom=None, subjectType=None,
     except Exception as e:
         print(f"Error querying absences: {e}")
         return []
+    
+def get_top_10_users_with_most_absences_from_firestore():
+    """
+    Retrieve the top 10 users with the highest number of absences from Firestore.
+    """
+    try:
+        absences_count = defaultdict(int)
+        absences = db.collection('absences').stream()
+
+        for absence in absences:
+            user_ref = absence.to_dict().get('username')
+            if user_ref:
+                absences_count[user_ref.id] += 1
+
+        top_10_user_ids = sorted(absences_count, key=absences_count.get, reverse=True)[:10]
+
+        return [
+            db.collection('users').document(user_id).get().to_dict().get('username')
+            for user_id in top_10_user_ids
+            if db.collection('users').document(user_id).get().exists
+        ]
+    except Exception as e:
+        print(f"Error retrieving top 10 users with most absences: {e}")
+
 
 # Renaming functions for backwards compatibility
 get_user_absences = query_absences
