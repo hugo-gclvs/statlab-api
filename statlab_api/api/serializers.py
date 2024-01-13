@@ -5,7 +5,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from services.session_manager import SessionManager
 from services.oge_scraper import OgeScraper
 from services.absence_service import AbsenceService
-
+from google.cloud.firestore_v1.base_query import FieldFilter
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -26,7 +26,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = RefreshToken()
-        print(user['id'])
         token['user_id'] = user['id']
         return token
 
@@ -47,7 +46,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             raise AuthenticationFailed('No active account found with the given credentials')
 
     def get_or_create_user(self, username):
-        user_query = db.collection('users').where('username', '==', username).get()
+        user_query = db.collection('users').where(filter=FieldFilter('username', '==', username)).get()
         if not user_query:
             user_ref = db.collection('users').document()
             user_ref.set({"username": username})
@@ -71,7 +70,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
                 db.collection('absences').document().set(absence)
 
     def get_user_reference(self, username):
-        return db.collection('users').where('username', '==', username).get()[0].reference
+        return db.collection('users').where(filter=FieldFilter('username', '==', username)).get()[0].reference
 
     def prepare_absences(self, absences, user_ref):
         subject_type_mapping = {
@@ -88,8 +87,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
     def absence_exists(self, absence, user_ref):
         start_date, end_date = absence['start_date'], absence['end_date']
-        existing_absences = db.collection('absences').where('username', '==', user_ref) \
-            .where('start_date', '==', start_date).where('end_date', '==', end_date).get()
+        existing_absences = db.collection('absences').where(filter=FieldFilter('username', '==', user_ref)) \
+            .where(filter=FieldFilter('start_date', '==', start_date)).where(filter=FieldFilter('end_date', '==', end_date)).get()
         return bool(existing_absences)
 
     def get_token_response(self, user):

@@ -1,5 +1,6 @@
 import datetime
 from firebase_admin import firestore
+from google.cloud.firestore_v1.base_query import FieldFilter
 
 # Initialize Firestore client
 db = firestore.client()
@@ -38,18 +39,24 @@ def convert_document_to_dict(document):
 
     return dict_document
 
-def query_absences(user_id, teacher_name=None, classroom=None):
+def query_absences(user_id, teacher_name=None, classroom=None, subjectType=None, subject=None, justification=None):
     """
-    Query absences for a user, optionally filtered by teacher name and classroom.
+    Query absences for a user, optionally filtered by teacher name, classroom, subject type, subject and justification.
     """
     try:
         user_ref = db.collection('users').document(user_id)
-        query = db.collection('absences').where('username', '==', user_ref)
+        query = db.collection('absences').where(filter=FieldFilter('username', '==', user_ref))
 
         if teacher_name:
-            query = query.where('teacher', '==', teacher_name)
+            query = query.where(filter=FieldFilter('teacher', '==', teacher_name))
         if classroom:
-            query = query.where('classroom', '==', classroom)
+            query = query.where(filter=FieldFilter('classroom', '==', classroom))
+        if subjectType:
+            query = query.where(filter=FieldFilter('subjectType', '==', "/subject_type/"+subjectType))
+        if subject:
+            query = query.where(filter=FieldFilter('subject', '==', subject))
+        if justification:
+            query = query.where(filter=FieldFilter('justification', '!=' if justification == 'true' else '==', "Aucun"))
 
         absences_query = query.get()
         return [convert_document_to_dict(absence) for absence in absences_query if absence.exists]

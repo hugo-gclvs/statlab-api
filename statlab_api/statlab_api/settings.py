@@ -144,6 +144,6 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # Durée de vie du jeton
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=59),  # Durée de vie du jeton
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # Durée de vie du jeton de rafraîchissement
 }
