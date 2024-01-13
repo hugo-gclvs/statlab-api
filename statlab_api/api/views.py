@@ -6,9 +6,20 @@ from rest_framework.views import APIView
 from .serializers import CustomTokenObtainPairSerializer
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .utils.firestore_utils import get_top_users_with_most_absences_by_classroom_from_firestore, get_top_users_with_most_absences_by_justification_from_firestore, get_top_users_with_most_absences_by_subject_from_firestore, get_top_users_with_most_absences_by_subject_type_from_firestore, get_top_users_with_most_absences_by_teacher_from_firestore, get_top_users_with_most_absences_from_firestore, get_user_absences, get_filtered_user_absences
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 
 logger = logging.getLogger(__name__)
+
+token_param = openapi.Parameter(
+    'Authorization',
+    openapi.IN_HEADER,
+    description="Bearer token",
+    type=openapi.TYPE_STRING,
+    bearerFormat="JWT",
+    required=True
+)
 
 class BaseAuthenticatedView(APIView):
     permission_classes = [IsAuthenticated]
@@ -19,6 +30,32 @@ class BaseAuthenticatedView(APIView):
         return validated_token.get('user_id')
 
 class LoginView(APIView):
+
+    @swagger_auto_schema(
+        request_body=CustomTokenObtainPairSerializer,
+        responses={
+            200: openapi.Response(
+                description="Authentication successful",
+                examples={
+                    'application/json': {
+                        'refresh': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX...',
+                        'access': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2Vy...',
+                    }
+                }
+            ),
+            400: openapi.Response(
+                description="Authentication failed",
+                examples={
+                    'application/json': {
+                        'non_field_errors': [
+                            "Unable to log in with provided credentials."
+                        ]
+                    }
+                }
+            )
+        }
+    )
+
     def post(self, request, *args, **kwargs):
         serializer = CustomTokenObtainPairSerializer(data=request.data)
 
@@ -27,6 +64,13 @@ class LoginView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserAbsencesView(BaseAuthenticatedView):
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            token_param,
+        ]
+    )
+
     def get(self, request, *args, **kwargs):
         try:
             user_id = self.get_user_id_from_token(request)
@@ -36,6 +80,18 @@ class UserAbsencesView(BaseAuthenticatedView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class FilteredAbsencesView(BaseAuthenticatedView):
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            token_param,
+            openapi.Parameter('teacher', openapi.IN_QUERY, description="Nom de l'enseignant", type=openapi.TYPE_STRING),
+            openapi.Parameter('classroom', openapi.IN_QUERY, description="Nom de la classe", type=openapi.TYPE_STRING),
+            openapi.Parameter('subjectType', openapi.IN_QUERY, description="Type de matière", type=openapi.TYPE_STRING),
+            openapi.Parameter('subject', openapi.IN_QUERY, description="Nom de la matière", type=openapi.TYPE_STRING),
+            openapi.Parameter('justification', openapi.IN_QUERY, description="Justification", type=openapi.TYPE_STRING),
+        ]
+    )
+
     def get(self, request, *args, **kwargs):
         try:
             user_id = self.get_user_id_from_token(request)
@@ -60,6 +116,19 @@ class AbsenceStatistiquesView(BaseAuthenticatedView):
         'subject_type': 'get_top_users_with_most_absences_by_subject_type',
         'justification': 'get_top_users_with_most_absences_by_justification'
     }
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            token_param,
+            openapi.Parameter('type', openapi.IN_QUERY, description="Statistiques type", type=openapi.TYPE_STRING, required=True),
+            openapi.Parameter('top_n', openapi.IN_QUERY, description="Results count", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('teacher', openapi.IN_QUERY, description="Teacher name", type=openapi.TYPE_STRING),
+            openapi.Parameter('classroom', openapi.IN_QUERY, description="Classroom name", type=openapi.TYPE_STRING),
+            openapi.Parameter('subject', openapi.IN_QUERY, description="Subject name", type=openapi.TYPE_STRING),
+            openapi.Parameter('subject_type', openapi.IN_QUERY, description="Subject type", type=openapi.TYPE_STRING),
+            openapi.Parameter('justification', openapi.IN_QUERY, description="Justification", type=openapi.TYPE_BOOLEAN),
+        ]
+    )
 
     def get(self, request, *args, **kwargs):
         try:
