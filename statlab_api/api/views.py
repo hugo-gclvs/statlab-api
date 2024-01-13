@@ -32,6 +32,7 @@ class BaseAuthenticatedView(APIView):
 class LoginView(APIView):
 
     @swagger_auto_schema(
+        operation_description="Authenticates a user and returns a JWT token",
         request_body=CustomTokenObtainPairSerializer,
         responses={
             200: openapi.Response(
@@ -66,6 +67,7 @@ class LoginView(APIView):
 class UserAbsencesView(BaseAuthenticatedView):
 
     @swagger_auto_schema(
+        operation_description="Returns the absences of the user",
         manual_parameters=[
             token_param,
         ]
@@ -82,6 +84,7 @@ class UserAbsencesView(BaseAuthenticatedView):
 class FilteredAbsencesView(BaseAuthenticatedView):
 
     @swagger_auto_schema(
+        operation_description="Returns the filtered absences of the user. All parameters are optional and can be combined.",
         manual_parameters=[
             token_param,
             openapi.Parameter('teacher', openapi.IN_QUERY, description="Nom de l'enseignant", type=openapi.TYPE_STRING),
@@ -118,6 +121,7 @@ class AbsenceStatistiquesView(BaseAuthenticatedView):
     }
 
     @swagger_auto_schema(
+        operation_description="Returns the top n users with the most absences. \"Type\" is not optional and must be one of the following: global, teacher, classroom, subject, subject_type, justification. Other parameters depend on the type. You can't combined type. Note that the top_n parameter is optional and defaults to 10. ",
         manual_parameters=[
             token_param,
             openapi.Parameter('type', openapi.IN_QUERY, description="Statistiques type", type=openapi.TYPE_STRING, required=True),
