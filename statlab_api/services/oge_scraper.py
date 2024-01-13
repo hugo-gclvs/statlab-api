@@ -19,6 +19,7 @@ class OgeScraper:
         self.login_url = "https://casiut21.u-bourgogne.fr/cas-esirem/login?service=https%3A%2F%2Fiutdijon.u-bourgogne.fr%2Foge-esirem%2F"
         self.absences_url = "https://iutdijon.u-bourgogne.fr/oge-esirem/stylesheets/etu/absencesEtu.xhtml"
         self.grades_url = "https://iutdijon.u-bourgogne.fr/oge-esirem/stylesheets/etu/bilanEtu.xhtml"
+        self.personnal_info_url = "https://iutdijon.u-bourgogne.fr/oge-esirem/stylesheets/etu/dossierEtu.xhtml"
             
 
     def get(self, url):
@@ -33,6 +34,19 @@ class OgeScraper:
         """
         print(f"Get {url}")
         return self.session_manager.session.get(url)
+    
+    def getPersonnalInfoPage(self):
+        """
+        This method is used to get the personnal info page from the OGE.
+
+        Parameters:
+            None
+
+        Returns:
+            str: The personnal info page.
+        """
+        response = self.session_manager.session.get(self.personnal_info_url)
+        return response.text
 
     def getAbsencesPage(self):
         """
