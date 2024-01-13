@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from .serializers import CustomTokenObtainPairSerializer
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from .utils.firestore_utils import get_top_10_users_with_most_absences_from_firestore, get_user_absences, get_filtered_user_absences
+from .utils.firestore_utils import get_top_10_users_with_most_absences_by_teacher_from_firestore, get_top_10_users_with_most_absences_from_firestore, get_user_absences, get_filtered_user_absences
 
 
 class BaseAuthenticatedView(APIView):
@@ -54,9 +54,12 @@ class AbsenceStatistiquesView(BaseAuthenticatedView):
             user_id = self.get_user_id_from_token(request)
             
             statistique_type = request.query_params.get('type')
+            teacher = request.query_params.get('teacher')
 
             if statistique_type == 'global':
                 return self.get_top_10_users_with_most_absences()
+            elif statistique_type == 'teacher':
+                return self.get_top_10_users_with_most_absences_by_teacher(teacher)
             else:
                 return Response({"error": "Invalid type"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -66,3 +69,7 @@ class AbsenceStatistiquesView(BaseAuthenticatedView):
     def get_top_10_users_with_most_absences(self):
         ranking = get_top_10_users_with_most_absences_from_firestore()
         return Response({"top_10_global_ranking": ranking})
+    
+    def get_top_10_users_with_most_absences_by_teacher(self, teacher_name):
+        ranking = get_top_10_users_with_most_absences_by_teacher_from_firestore(teacher_name)
+        return Response({"top_10_teacher_ranking": ranking})
