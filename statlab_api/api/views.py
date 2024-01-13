@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from .serializers import CustomTokenObtainPairSerializer
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from .utils.firestore_utils import get_top_10_users_with_most_absences_by_classroom_from_firestore, get_top_10_users_with_most_absences_by_subject_from_firestore, get_top_10_users_with_most_absences_by_subject_type_from_firestore, get_top_10_users_with_most_absences_by_teacher_from_firestore, get_top_10_users_with_most_absences_from_firestore, get_user_absences, get_filtered_user_absences
+from .utils.firestore_utils import get_top_10_users_with_most_absences_by_classroom_from_firestore, get_top_10_users_with_most_absences_by_justification_from_firestore, get_top_10_users_with_most_absences_by_subject_from_firestore, get_top_10_users_with_most_absences_by_subject_type_from_firestore, get_top_10_users_with_most_absences_by_teacher_from_firestore, get_top_10_users_with_most_absences_from_firestore, get_user_absences, get_filtered_user_absences
 
 
 class BaseAuthenticatedView(APIView):
@@ -58,6 +58,7 @@ class AbsenceStatistiquesView(BaseAuthenticatedView):
             classroom = request.query_params.get('classroom')
             subject = request.query_params.get('subject')
             subject_type = request.query_params.get('subject_type')
+            justification = request.query_params.get('areJustified')
 
             if statistique_type == 'global':
                 return self.get_top_10_users_with_most_absences()
@@ -69,6 +70,8 @@ class AbsenceStatistiquesView(BaseAuthenticatedView):
                 return self.get_top_10_users_with_most_absences_by_subject(subject)
             elif statistique_type == 'subject_type':
                 return self.get_top_10_users_with_most_absences_by_subject_type(subject_type)
+            elif statistique_type == 'justification':
+                return self.get_top_10_users_with_most_absences_by_justification(justification)
             else:
                 return Response({"error": "Invalid type"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -94,3 +97,10 @@ class AbsenceStatistiquesView(BaseAuthenticatedView):
     def get_top_10_users_with_most_absences_by_subject_type(self, subject_type):
         ranking = get_top_10_users_with_most_absences_by_subject_type_from_firestore(subject_type)
         return Response({"top_10_subject_type_ranking": ranking})
+    
+    def get_top_10_users_with_most_absences_by_justification(self, justification):
+        ranking = get_top_10_users_with_most_absences_by_justification_from_firestore(justification)
+        if justification == 'true':
+            return Response({"top_10_justified_ranking": ranking})
+        else:
+            return Response({"top_10_unjustified_ranking": ranking})
