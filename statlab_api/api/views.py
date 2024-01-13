@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from .serializers import CustomTokenObtainPairSerializer
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from .utils.firestore_utils import get_top_10_users_with_most_absences_by_classroom_from_firestore, get_top_10_users_with_most_absences_by_teacher_from_firestore, get_top_10_users_with_most_absences_from_firestore, get_user_absences, get_filtered_user_absences
+from .utils.firestore_utils import get_top_10_users_with_most_absences_by_classroom_from_firestore, get_top_10_users_with_most_absences_by_subject_from_firestore, get_top_10_users_with_most_absences_by_teacher_from_firestore, get_top_10_users_with_most_absences_from_firestore, get_user_absences, get_filtered_user_absences
 
 
 class BaseAuthenticatedView(APIView):
@@ -56,6 +56,7 @@ class AbsenceStatistiquesView(BaseAuthenticatedView):
             statistique_type = request.query_params.get('type')
             teacher = request.query_params.get('teacher')
             classroom = request.query_params.get('classroom')
+            subject = request.query_params.get('subject')
 
             if statistique_type == 'global':
                 return self.get_top_10_users_with_most_absences()
@@ -63,6 +64,8 @@ class AbsenceStatistiquesView(BaseAuthenticatedView):
                 return self.get_top_10_users_with_most_absences_by_teacher(teacher)
             elif statistique_type == 'classroom':
                 return self.get_top_10_users_with_most_absences_by_classroom(classroom)
+            elif statistique_type == 'subject':
+                return self.get_top_10_users_with_most_absences_by_subject(subject)
             else:
                 return Response({"error": "Invalid type"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -80,3 +83,7 @@ class AbsenceStatistiquesView(BaseAuthenticatedView):
     def get_top_10_users_with_most_absences_by_classroom(self, classroom):
         ranking = get_top_10_users_with_most_absences_by_classroom_from_firestore(classroom)
         return Response({"top_10_classroom_ranking": ranking})
+    
+    def get_top_10_users_with_most_absences_by_subject(self, subject):
+        ranking = get_top_10_users_with_most_absences_by_subject_from_firestore(subject)
+        return Response({"top_10_subject_ranking": ranking})
