@@ -32,15 +32,24 @@ class BaseAuthenticatedView(APIView):
 class LoginView(APIView):
 
     @swagger_auto_schema(
-        operation_description="Authenticates a user and returns a JWT token",
+        operation_description="Authenticates a user and returns a JWT token and the user's information",
         request_body=CustomTokenObtainPairSerializer,
         responses={
             200: openapi.Response(
                 description="Authentication successful",
                 examples={
                     'application/json': {
-                        'refresh': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX...',
-                        'access': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2Vy...',
+                        'tokens': {
+                            'refresh': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX...',
+                            'access': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2Vy...',
+                        },
+                        'user': {
+                            'username': 'username',
+                            'first_name': 'first_name',
+                            'last_name': 'last_name',
+                            'specialization': 'specialization',
+                            'study_year': 'study_year'
+                        }
                     }
                 }
             ),
@@ -70,7 +79,38 @@ class UserAbsencesView(BaseAuthenticatedView):
         operation_description="Returns the absences of the user",
         manual_parameters=[
             token_param,
-        ]
+        ],
+        responses={
+            200: openapi.Response(
+                description="Absences retrieved successfully",
+                examples={
+                    'application/json': {
+                        'absences': [
+                            {
+                                'id': 'absence_id',
+                                'date': '2021-01-01',
+                                'teacher': 'teacher_name',
+                                'classroom': 'classroom_name',
+                                'subjectType': 'subject_type',
+                                'subject': 'subject_name',
+                                'justification': 'justification',
+                                'username': 'username',
+                                'start_date': '2023-09-19T10:15:00+00:00',
+                                'end_date': '2023-09-19T11:15:00+00:00',
+                            }
+                        ]
+                    }
+                }
+            ),
+            500: openapi.Response(
+                description="An error occurred while retrieving absences",
+                examples={
+                    'application/json': {
+                        'error': 'Error message'
+                    }
+                }
+            )
+        }
     )
 
     def get(self, request, *args, **kwargs):
@@ -92,7 +132,38 @@ class FilteredAbsencesView(BaseAuthenticatedView):
             openapi.Parameter('subjectType', openapi.IN_QUERY, description="Type de matière", type=openapi.TYPE_STRING),
             openapi.Parameter('subject', openapi.IN_QUERY, description="Nom de la matière", type=openapi.TYPE_STRING),
             openapi.Parameter('justification', openapi.IN_QUERY, description="Justification", type=openapi.TYPE_STRING),
-        ]
+        ],
+        responses={
+            200: openapi.Response(
+                description="Absences retrieved successfully",
+                examples={
+                    'application/json': {
+                        'absences': [
+                            {
+                                'id': 'absence_id',
+                                'date': '2021-01-01',
+                                'teacher': 'teacher_name',
+                                'classroom': 'classroom_name',
+                                'subjectType': 'subject_type',
+                                'subject': 'subject_name',
+                                'justification': 'justification',
+                                'username': 'username',
+                                'start_date': '2023-09-19T10:15:00+00:00',
+                                'end_date': '2023-09-19T11:15:00+00:00',
+                            }
+                        ]
+                    }
+                }
+            ),
+            500: openapi.Response(
+                description="An error occurred while retrieving absences",
+                examples={
+                    'application/json': {
+                        'error': 'Error message'
+                    }
+                }
+            )
+        }
     )
 
     def get(self, request, *args, **kwargs):
@@ -121,7 +192,7 @@ class AbsenceStatistiquesView(BaseAuthenticatedView):
     }
 
     @swagger_auto_schema(
-        operation_description="Returns the top n users with the most absences. \"Type\" is not optional and must be one of the following: global, teacher, classroom, subject, subject_type, justification. Other parameters depend on the type. You can't combined type. Note that the top_n parameter is optional and defaults to 10. ",
+        operation_description="Returns the top n users with the most absences. \"Type\" is not optional and must be one of the following: global, teacher, classroom, subject, subject_type, justification. Other parameters depend on the type. You can't combined type. Note that the top_n parameter is optional and defaults to 10.",
         manual_parameters=[
             token_param,
             openapi.Parameter('type', openapi.IN_QUERY, description="Statistiques type", type=openapi.TYPE_STRING, required=True),
@@ -131,7 +202,41 @@ class AbsenceStatistiquesView(BaseAuthenticatedView):
             openapi.Parameter('subject', openapi.IN_QUERY, description="Subject name", type=openapi.TYPE_STRING),
             openapi.Parameter('subject_type', openapi.IN_QUERY, description="Subject type", type=openapi.TYPE_STRING),
             openapi.Parameter('justification', openapi.IN_QUERY, description="Justification", type=openapi.TYPE_BOOLEAN),
-        ]
+        ],
+        responses={
+            200: openapi.Response(
+                description="Statistics retrieved successfully",
+                examples={
+                    'application/json': {
+                        'top_n_global_ranking': [
+                            {
+                                'username': 'username',
+                                'first_name': 'first_name',
+                                'last_name': 'last_name',
+                                'specialization': 'specialization',
+                                'study_year': 'study_year'
+                            }
+                        ]
+                    }
+                }
+            ),
+            400: openapi.Response(
+                description="Invalid type",
+                examples={
+                    'application/json': {
+                        'error': 'Invalid type'
+                    }
+                }
+            ),
+            500: openapi.Response(
+                description="An error occurred while retrieving statistics",
+                examples={
+                    'application/json': {
+                        'error': 'Error message'
+                    }
+                }
+            )
+        }
     )
 
     def get(self, request, *args, **kwargs):
@@ -193,5 +298,5 @@ class AbsenceStatistiquesView(BaseAuthenticatedView):
     def get_top_users_with_most_absences_by_justification(self, params, top_n):
         justification = params.get('areJustified', 'false')
         ranking = get_top_users_with_most_absences_by_justification_from_firestore(justification, top_n)
-        ranking_key = f"top_"+str(top_n)+"_{'justified' if justification == 'true' else 'unjustified'}_ranking"
+        ranking_key = f"top_{top_n}_{'justified' if justification == 'true' else 'unjustified'}_ranking"
         return Response({ranking_key: ranking})
