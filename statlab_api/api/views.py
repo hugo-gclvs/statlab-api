@@ -298,5 +298,5 @@ class AbsenceStatistiquesView(BaseAuthenticatedView):
     def get_top_users_with_most_absences_by_justification(self, params, top_n):
         justification = params.get('areJustified', 'false')
         ranking = get_top_users_with_most_absences_by_justification_from_firestore(justification, top_n)
-        ranking_key = f"top_"+str(top_n)+"_{'justified' if justification == 'true' else 'unjustified'}_ranking"
+        ranking_key = f"top_{top_n}_{'justified' if justification == 'true' else 'unjustified'}_ranking"
         return Response({ranking_key: ranking})
