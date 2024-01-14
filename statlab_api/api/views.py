@@ -79,7 +79,38 @@ class UserAbsencesView(BaseAuthenticatedView):
         operation_description="Returns the absences of the user",
         manual_parameters=[
             token_param,
-        ]
+        ],
+        responses={
+            200: openapi.Response(
+                description="Absences retrieved successfully",
+                examples={
+                    'application/json': {
+                        'absences': [
+                            {
+                                'id': 'absence_id',
+                                'date': '2021-01-01',
+                                'teacher': 'teacher_name',
+                                'classroom': 'classroom_name',
+                                'subjectType': 'subject_type',
+                                'subject': 'subject_name',
+                                'justification': 'justification',
+                                'username': 'username',
+                                'start_date': '2023-09-19T10:15:00+00:00',
+                                'end_date': '2023-09-19T11:15:00+00:00',
+                            }
+                        ]
+                    }
+                }
+            ),
+            500: openapi.Response(
+                description="An error occurred while retrieving absences",
+                examples={
+                    'application/json': {
+                        'error': 'Error message'
+                    }
+                }
+            )
+        }
     )
 
     def get(self, request, *args, **kwargs):
