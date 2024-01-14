@@ -168,30 +168,30 @@ class AbsenceStatistiquesView(BaseAuthenticatedView):
         
     def get_top_users_with_most_absences(self, params, top_n):
         ranking = get_top_users_with_most_absences_from_firestore(top_n)
-        return Response({"top_10_global_ranking": ranking})
+        return Response({"top_"+str(top_n)+"_global_ranking": ranking})
     
     def get_top_users_with_most_absences_by_teacher(self, params, top_n):
         teacher_name = params.get('teacher')
         ranking = get_top_users_with_most_absences_by_teacher_from_firestore(teacher_name, top_n)
-        return Response({"top_10_teacher_ranking": ranking})
+        return Response({"top_"+str(top_n)+"_teacher_ranking": ranking})
     
     def get_top_users_with_most_absences_by_classroom(self, params, top_n):
         classroom = params.get('classroom')
         ranking = get_top_users_with_most_absences_by_classroom_from_firestore(classroom, top_n)
-        return Response({"top_10_classroom_ranking": ranking})
+        return Response({"top_"+str(top_n)+"_classroom_ranking": ranking})
     
     def get_top_users_with_most_absences_by_subject(self, params, top_n):
         subject = params.get('subject')
         ranking = get_top_users_with_most_absences_by_subject_from_firestore(subject, top_n)
-        return Response({"top_10_subject_ranking": ranking})
+        return Response({"top_"+str(top_n)+"_subject_ranking": ranking})
     
     def get_top_users_with_most_absences_by_subject_type(self, params, top_n):
         subject_type = params.get('subject_type')
         ranking = get_top_users_with_most_absences_by_subject_type_from_firestore(subject_type, top_n)
-        return Response({"top_10_subject_type_ranking": ranking})
+        return Response({"top_"+str(top_n)+"_subject_type_ranking": ranking})
     
     def get_top_users_with_most_absences_by_justification(self, params, top_n):
         justification = params.get('areJustified', 'false')
         ranking = get_top_users_with_most_absences_by_justification_from_firestore(justification, top_n)
-        ranking_key = f"top_10_{'justified' if justification == 'true' else 'unjustified'}_ranking"
+        ranking_key = f"top_"+str(top_n)+"_{'justified' if justification == 'true' else 'unjustified'}_ranking"
         return Response({ranking_key: ranking})
