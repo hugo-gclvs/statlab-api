@@ -32,15 +32,24 @@ class BaseAuthenticatedView(APIView):
 class LoginView(APIView):
 
     @swagger_auto_schema(
-        operation_description="Authenticates a user and returns a JWT token",
+        operation_description="Authenticates a user and returns a JWT token and the user's information",
         request_body=CustomTokenObtainPairSerializer,
         responses={
             200: openapi.Response(
                 description="Authentication successful",
                 examples={
                     'application/json': {
-                        'refresh': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX...',
-                        'access': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2Vy...',
+                        'tokens': {
+                            'refresh': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX...',
+                            'access': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2Vy...',
+                        },
+                        'user': {
+                            'username': 'username',
+                            'first_name': 'first_name',
+                            'last_name': 'last_name',
+                            'specialization': 'specialization',
+                            'study_year': 'study_year'
+                        }
                     }
                 }
             ),
