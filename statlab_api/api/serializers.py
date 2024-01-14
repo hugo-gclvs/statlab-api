@@ -110,4 +110,10 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
     def get_token_response(self, user):
         refresh = self.get_token(user)
-        return {'refresh': str(refresh), 'access': str(refresh.access_token)}
+        return {
+            'tokens': {
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            },
+            'user': user
+        }
