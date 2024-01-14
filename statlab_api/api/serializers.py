@@ -14,7 +14,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('username',)
+        fields = ('username', 'last_name', 'first_name', 'specialization', 'study_year')
 
 class AbsenceSerializer(serializers.ModelSerializer):
     class Meta:
@@ -32,10 +32,12 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
     def validate(self, attrs):
         username, password = self.get_credentials(attrs)
-        self.validate_user_credentials(username, password)
+        session_manager = SessionManager(user=username, pwd=password)
+        if not session_manager.login():
+            raise AuthenticationFailed('No active account found with the given credentials')
 
-        user = self.get_or_create_user(username, password)
-        self.process_user_absences(username, password)
+        user = self.get_or_create_user(username, session_manager)
+        self.process_user_absences(username, session_manager)
 
         return self.get_token_response(user)
 
@@ -46,10 +48,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         if not SessionManager(user=username, pwd=password).login():
             raise AuthenticationFailed('No active account found with the given credentials')
 
-    def get_or_create_user(self, username, password):
+    def get_or_create_user(self, username, session_manager):
         user_query = db.collection('users').where(filter=FieldFilter('username', '==', username)).get()
-        session_manager = SessionManager(user=username, pwd=password)
-        session_manager.login()
         oge_scraper = OgeScraper(session_manager)
         personal_info_service = PersonalInfoService(oge_scraper)
 
@@ -67,21 +67,24 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         return convert_document_to_dict(user_query[0])
 
-    def process_user_absences(self, username, password):
-        absences = self.scrape_user_absences(username, password)
+    def process_user_absences(self, username, session_manager):
+        absences = self.scrape_user_absences(username, session_manager)
         self.store_absences_in_firestore(absences, username)
 
-    def scrape_user_absences(self, username, password):
-        session_manager = SessionManager(user=username, pwd=password)
-        session_manager.login()
+    def scrape_user_absences(self, username, session_manager):
         oge_scraper = OgeScraper(session_manager)
         return AbsenceService(oge_scraper).getAllAbsences()
 
     def store_absences_in_firestore(self, absences, username):
         user_ref = self.get_user_reference(username)
+        batch = db.batch() 
+
         for absence in self.prepare_absences(absences, user_ref):
             if not self.absence_exists(absence, user_ref):
-                db.collection('absences').document().set(absence)
+                doc_ref = db.collection('absences').document()
+                batch.set(doc_ref, absence)
+
+        batch.commit() 
 
     def get_user_reference(self, username):
         return db.collection('users').where(filter=FieldFilter('username', '==', username)).get()[0].reference
