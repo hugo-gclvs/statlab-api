@@ -53,7 +53,7 @@ def query_absences(user_id, teacher_name=None, classroom=None, subject_type=None
             'classroom': classroom,
             'subjectType': f"/subject_type/{subject_type}" if subject_type else None,
             'subject': subject,
-            'justification': "Aucun" if justification != 'true' else None
+            'justification': "Aucun" if justification == 'true' else None
         }
 
         for field, value in filters.items():
