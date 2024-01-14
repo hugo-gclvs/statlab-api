@@ -5,6 +5,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from services.session_manager import SessionManager
 from services.oge_scraper import OgeScraper
 from services.absence_service import AbsenceService
+from services.personal_info_service import PersonalInfoService
 from google.cloud.firestore_v1.base_query import FieldFilter
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -33,7 +34,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         username, password = self.get_credentials(attrs)
         self.validate_user_credentials(username, password)
 
-        user = self.get_or_create_user(username)
+        user = self.get_or_create_user(username, password)
         self.process_user_absences(username, password)
 
         return self.get_token_response(user)
@@ -45,12 +46,25 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         if not SessionManager(user=username, pwd=password).login():
             raise AuthenticationFailed('No active account found with the given credentials')
 
-    def get_or_create_user(self, username):
+    def get_or_create_user(self, username, password):
         user_query = db.collection('users').where(filter=FieldFilter('username', '==', username)).get()
+        session_manager = SessionManager(user=username, pwd=password)
+        session_manager.login()
+        oge_scraper = OgeScraper(session_manager)
+        personal_info_service = PersonalInfoService(oge_scraper)
+
         if not user_query:
             user_ref = db.collection('users').document()
-            user_ref.set({"username": username})
-            return {"username": username, "reference": user_ref}
+            user = personal_info_service.getStudentInfo()
+            user_ref.set({
+                "username": username,
+                "last_name": user['last_name'],
+                "first_name": user['first_name'],
+                "specialization": user['specialization'],
+                "study_year": user['study_year'],
+            })
+            user_query = db.collection('users').where(filter=FieldFilter('username', '==', username)).get()
+
         return convert_document_to_dict(user_query[0])
 
     def process_user_absences(self, username, password):

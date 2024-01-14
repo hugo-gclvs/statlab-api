@@ -35,7 +35,7 @@ class OgeScraper:
         print(f"Get {url}")
         return self.session_manager.session.get(url)
     
-    def getPersonnalInfoPage(self):
+    def getPersonalInfoPage(self):
         """
         This method is used to get the personnal info page from the OGE.
 

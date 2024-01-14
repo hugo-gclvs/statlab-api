@@ -1,3 +1,4 @@
+import re
 from bs4 import BeautifulSoup
 from services.processors.absence_processor import AbsenceProcessor
 
@@ -23,17 +24,26 @@ def create_absences(absencesPage):
 def create_student_info(studentInfoPage):
 	soup = BeautifulSoup(studentInfoPage, 'html.parser')
 
-	student_info_table = soup.find('table', id_='pageDossierForm:EtuInfoPanelGrid')
+	student_info_table = soup.find('table', {"id": "pageDossierForm:EtuInfoPanelGrid"})
 
-	print(student_info_table)
-	# student_info_data = []
-	# for row in student_info_table.find_all('tr'):
-	# 	columns = row.find_all('td')
-	# 	student_info_data.append([column.get_text(strip=True) for column in columns])
+	name_line = student_info_table.find('span', style=lambda value: value and 'font-size:1.6em' in value)
+	if name_line:
+			full_name = name_line.get_text().strip()
+			last_name, first_name = full_name.split()[:2] 
 
-	# student_info = {}
+	# Extraire le groupe
+	group_line = student_info_table.find_all('td')[-2]
+	if group_line:
+			group_text = group_line.get_text().strip()
+			group = group_text.split()[0]
 
-	# for row in student_info_data:
-	# 	student_info[row[0]] = row[1]
+			match = re.match(r"([a-zA-Z]+)([0-9]+)", group)
+			if match:
+					specialization, study_year = match.groups()
 
-	return "student_info", "student_info", "student_info"
+	return {
+		"last_name": last_name,
+		"first_name": first_name,
+		"specialization": specialization,
+		"study_year": study_year,
+	}

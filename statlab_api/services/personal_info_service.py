@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import services.utils.data_processing as data_processing
 
 
-class PersonnalInfoService:
+class PersonalInfoService:
     def __init__(self, oge_scraper):
         self.oge_scraper = oge_scraper
     
@@ -17,7 +17,7 @@ class PersonnalInfoService:
         Returns:
             dict: The student information.
         """
-        studentInfoPage = self.oge_scraper.getPersonnalInfoPage()
+        studentInfoPage = self.oge_scraper.getPersonalInfoPage()
         return data_processing.create_student_info(studentInfoPage)
 
 
