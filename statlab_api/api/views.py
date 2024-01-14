@@ -192,7 +192,7 @@ class AbsenceStatistiquesView(BaseAuthenticatedView):
     }
 
     @swagger_auto_schema(
-        operation_description="Returns the top n users with the most absences. \"Type\" is not optional and must be one of the following: global, teacher, classroom, subject, subject_type, justification. Other parameters depend on the type. You can't combined type. Note that the top_n parameter is optional and defaults to 10. ",
+        operation_description="Returns the top n users with the most absences. \"Type\" is not optional and must be one of the following: global, teacher, classroom, subject, subject_type, justification. Other parameters depend on the type. You can't combined type. Note that the top_n parameter is optional and defaults to 10.",
         manual_parameters=[
             token_param,
             openapi.Parameter('type', openapi.IN_QUERY, description="Statistiques type", type=openapi.TYPE_STRING, required=True),
@@ -202,7 +202,41 @@ class AbsenceStatistiquesView(BaseAuthenticatedView):
             openapi.Parameter('subject', openapi.IN_QUERY, description="Subject name", type=openapi.TYPE_STRING),
             openapi.Parameter('subject_type', openapi.IN_QUERY, description="Subject type", type=openapi.TYPE_STRING),
             openapi.Parameter('justification', openapi.IN_QUERY, description="Justification", type=openapi.TYPE_BOOLEAN),
-        ]
+        ],
+        responses={
+            200: openapi.Response(
+                description="Statistics retrieved successfully",
+                examples={
+                    'application/json': {
+                        'top_n_global_ranking': [
+                            {
+                                'username': 'username',
+                                'first_name': 'first_name',
+                                'last_name': 'last_name',
+                                'specialization': 'specialization',
+                                'study_year': 'study_year'
+                            }
+                        ]
+                    }
+                }
+            ),
+            400: openapi.Response(
+                description="Invalid type",
+                examples={
+                    'application/json': {
+                        'error': 'Invalid type'
+                    }
+                }
+            ),
+            500: openapi.Response(
+                description="An error occurred while retrieving statistics",
+                examples={
+                    'application/json': {
+                        'error': 'Error message'
+                    }
+                }
+            )
+        }
     )
 
     def get(self, request, *args, **kwargs):

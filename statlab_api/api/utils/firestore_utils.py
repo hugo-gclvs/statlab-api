@@ -90,7 +90,7 @@ def get_top_users_with_most_absences_from_firestore(top_n):
         top_n_user_ids = sorted(absences_count, key=absences_count.get, reverse=True)[:top_n]
 
         return [
-            db.collection('users').document(user_id).get().to_dict().get('username')
+            db.collection('users').document(user_id).get().to_dict()
             for user_id in top_n_user_ids
             if db.collection('users').document(user_id).get().exists
         ]
@@ -114,7 +114,7 @@ def get_top_users_with_most_absences_by_teacher_from_firestore(teacher_name, top
         top_n_user_ids = sorted(absences_count, key=absences_count.get, reverse=True)[:top_n]
 
         return [
-            db.collection('users').document(user_id).get().to_dict().get('username')
+            db.collection('users').document(user_id).get().to_dict()
             for user_id in top_n_user_ids
             if db.collection('users').document(user_id).get().exists
         ]
@@ -138,7 +138,7 @@ def get_top_users_with_most_absences_by_classroom_from_firestore(classroom, top_
         top_n_user_ids = sorted(absences_count, key=absences_count.get, reverse=True)[:top_n]
 
         return [
-            db.collection('users').document(user_id).get().to_dict().get('username')
+            db.collection('users').document(user_id).get().to_dict()
             for user_id in top_n_user_ids
             if db.collection('users').document(user_id).get().exists
         ]
@@ -162,7 +162,7 @@ def get_top_users_with_most_absences_by_subject_from_firestore(subject, top_n):
         top_n_user_ids = sorted(absences_count, key=absences_count.get, reverse=True)[:top_n]
 
         return [
-            db.collection('users').document(user_id).get().to_dict().get('username')
+            db.collection('users').document(user_id).get().to_dict()
             for user_id in top_n_user_ids
             if db.collection('users').document(user_id).get().exists
         ]
@@ -185,7 +185,7 @@ def get_top_users_with_most_absences_by_subject_type_from_firestore(subject_type
         top_n_user_ids = sorted(absences_count, key=absences_count.get, reverse=True)[:top_n]
 
         return [
-            db.collection('users').document(user_id).get().to_dict().get('username')
+            db.collection('users').document(user_id).get().to_dict()
             for user_id in top_n_user_ids
             if db.collection('users').document(user_id).get().exists
         ]
@@ -209,7 +209,7 @@ def get_top_users_with_most_absences_by_justification_from_firestore(justificati
         top_n_user_ids = sorted(absences_count, key=absences_count.get, reverse=True)[:top_n]
 
         return [
-            db.collection('users').document(user_id).get().to_dict().get('username')
+            db.collection('users').document(user_id).get().to_dict()
             for user_id in top_n_user_ids
             if db.collection('users').document(user_id).get().exists
         ]
