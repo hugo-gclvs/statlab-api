@@ -2,10 +2,18 @@ from django.db import models
 
 class User(models.Model):
     username = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    first_name = models.CharField(max_length=100)
+    specialization = models.CharField(max_length=100)
+    study_year = models.CharField(max_length=100)
 
     def to_dict(self):
         return {
-            'username': self.username
+            'username': self.username,
+            'last_name': self.last_name,
+            'first_name': self.first_name,
+            'specialization': self.specialization,
+            'study_year': self.study_year,
         }
 
 class Absence(models.Model):

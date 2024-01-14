@@ -1,2 +1,2 @@
 Credit:
-* OGE Scrapper Service: [MARTINEZ Roméo](https://github.com/Romeo-mz)
+* OGE Scraper Service: [MARTINEZ Roméo](https://github.com/Romeo-mz)
