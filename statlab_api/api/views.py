@@ -214,7 +214,16 @@ class AbsenceStatistiquesView(BaseAuthenticatedView):
                                 'first_name': 'first_name',
                                 'last_name': 'last_name',
                                 'specialization': 'specialization',
-                                'study_year': 'study_year'
+                                'study_year': 'study_year',
+                                'absences_count': 10
+                            },
+                            {
+                                'username': 'username',
+                                'first_name': 'first_name',
+                                'last_name': 'last_name',
+                                'specialization': 'specialization',
+                                'study_year': 'study_year',
+                                'absences_count': 4
                             }
                         ]
                     }
