@@ -89,13 +89,18 @@ def get_top_users_with_most_absences_from_firestore(top_n):
 
         top_n_user_ids = sorted(absences_count, key=absences_count.get, reverse=True)[:top_n]
 
-        return [
-            db.collection('users').document(user_id).get().to_dict()
-            for user_id in top_n_user_ids
-            if db.collection('users').document(user_id).get().exists
-        ]
+        top_users_with_absences = []
+        for user_id in top_n_user_ids:
+            user_doc = db.collection('users').document(user_id).get()
+            if user_doc.exists:
+                user_data = user_doc.to_dict()
+                user_data['absences_count'] = absences_count[user_id]
+                top_users_with_absences.append(user_data)
+
+        return top_users_with_absences
     except Exception as e:
         print(f"Error retrieving top n users with most absences: {e}")
+        return []
 
 
 def get_top_users_with_most_absences_by_teacher_from_firestore(teacher_name, top_n):
