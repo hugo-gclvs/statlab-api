@@ -20,7 +20,9 @@ class AbsenceService:
         semesters = self._countSemesters()
         absences = []
         for semester in range(semesters, 0, -1):
-            absencesPage = self._fetchAbsencesForSemester(semester)
+            absencesAjaxPage = self._fetchAbsencesForSemester(semester)
+            absencesPage = self.oge_scraper.getAbsencesPage()
+            
             if absencesPage:
                 absences.extend(data_processing.create_absences(absencesPage))
         return absences

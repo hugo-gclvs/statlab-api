@@ -5,8 +5,6 @@ from services.processors.absence_processor import AbsenceProcessor
 def create_absences(absencesPage):
 	soup = BeautifulSoup(absencesPage, 'html.parser')
 
-	print(soup)
-
 	specific_table = soup.find('table', id='ficheEtudiantForm:j_id_1a')
 	if not specific_table:
 		return []
