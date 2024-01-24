@@ -5,7 +5,8 @@ from services.processors.absence_processor import AbsenceProcessor
 def create_absences(absencesPage):
 	soup = BeautifulSoup(absencesPage, 'html.parser')
 
-	absences_table = soup.find_all('tr', class_='ui-widget-content')
+	specific_table = soup.find('table', id='ficheEtudiantForm:j_id_1a')
+	absences_table = specific_table.find_all('tr', class_='ui-widget-content')
 
 	absences_data = []
 	for row in absences_table:

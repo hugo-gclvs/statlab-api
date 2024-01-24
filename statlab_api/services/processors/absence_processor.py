@@ -82,6 +82,9 @@ class AbsenceProcessor:
         return Absence(AbsenceProcessor.id_counter, subject, subjectType, classroom, teacher, start_date, end_date, justification)
     
     def convert_to_timestamps(self, date_str):
+        # If date_str is "Aucun", then return fake timestamps
+        if(date_str == "Aucun"):
+            return 0, 0
         date_part, times_part = date_str.replace("Le ", "").split(' de ')
         start_time_str, end_time_str = times_part.split(' à ')
 
