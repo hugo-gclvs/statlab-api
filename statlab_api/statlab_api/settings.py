@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'api',
     'rest_framework_simplejwt',
     'drf_yasg',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -51,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'statlab_api.urls'
@@ -134,7 +136,7 @@ import firebase_admin
 from firebase_admin import credentials
 from datetime import timedelta
 
-cred = credentials.Certificate('./firebase-adminsdk.json')
+cred = credentials.Certificate('/Users/rom/Documents/Code/Python/django-api/statlab-api/statlab_api/statlab_api/firebase-adminsdk.json')
 firebase_admin.initialize_app(cred)
 
 
@@ -158,3 +160,21 @@ SWAGGER_SETTINGS = {
       }
    }
 }
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000"
+   
+]
+
+CORS_ALLOW_HEADERS = [
+    'Content-Type',
+    'Authorization',
+    'Refresh',
+    'Origin',
+    'Request-Method',
+    'Accept',
+    'Accept-Encoding',
+]
+
+CORS_ALLOW_CREDENTIALS = True
