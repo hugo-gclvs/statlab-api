@@ -9,7 +9,7 @@ from services.personal_info_service import PersonalInfoService
 from google.cloud.firestore_v1.base_query import FieldFilter
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken
-
+import asyncio
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -20,7 +20,6 @@ class AbsenceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Absence
         fields = ('id', 'subject', 'subjectType', 'classroom', 'teacher', 'start_date', 'end_date', 'justification', 'username')
-
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
@@ -67,15 +66,15 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         return convert_document_to_dict(user_query[0])
 
-    def process_user_absences(self, username, session_manager):
-        absences = self.scrape_user_absences(username, session_manager)
-        self.store_absences_in_firestore(absences, username)
+    async def process_user_absences(self, username, session_manager):
+        absences = await asyncio.to_thread(self.scrape_user_absences(username, session_manager))
+        await asyncio.to_thread(self.store_absences_in_firestore(absences, username))
 
-    def scrape_user_absences(self, username, session_manager):
+    async def scrape_user_absences(self, username, session_manager):
         oge_scraper = OgeScraper(session_manager)
         return AbsenceService(oge_scraper).getAllAbsences()
 
-    def store_absences_in_firestore(self, absences, username):
+    async def store_absences_in_firestore(self, absences, username):
         user_ref = self.get_user_reference(username)
         batch = db.batch() 
 
