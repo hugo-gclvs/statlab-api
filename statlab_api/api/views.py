@@ -185,6 +185,58 @@ class AllUsersAbsencesStatistiquesView(BaseAuthenticatedView):
         'subject': 'get_all_users_by_subject_absences'
     }
 
+    @swagger_auto_schema(
+        operation_description="Returns the users with absences in a specific subject",
+        manual_parameters=[
+            token_param,
+            openapi.Parameter('type', openapi.IN_QUERY, description="Statistiques type", type=openapi.TYPE_STRING, required=True),
+            openapi.Parameter('subject', openapi.IN_QUERY, description="Subject name", type=openapi.TYPE_STRING),
+        ],
+        responses={
+            200: openapi.Response(
+                description="Statistics retrieved successfully",
+                examples={
+                    'application/json': {
+                        'users_with_absences_in_specific_subject': [
+                            {
+                                'username': 'username',
+                                'first_name': 'first_name',
+                                'last_name': 'last_name',
+                                'specialization': 'specialization',
+                                'study_year': 'study_year',
+                                'absences_count': 10
+                            },
+                            {
+                                'username': 'username',
+                                'first_name': 'first_name',
+                                'last_name': 'last_name',
+                                'specialization': 'specialization',
+                                'study_year': 'study_year',
+                                'absences_count': 4
+                            }
+                        ]
+                    }
+                }
+            ),
+            400: openapi.Response(
+                description="Invalid type",
+                examples={
+                    'application/json': {
+                        'error': 'Invalid type'
+                    }
+                }
+            ),
+            500: openapi.Response(
+                description="An error occurred while retrieving statistics",
+                examples={
+                    'application/json': {
+                        'error': 'Error message'
+                    }
+                }
+            )
+        }
+    )
+
     def get(self, request, *args, **kwargs):
         try:
             user_id = self.get_user_id_from_token(request)

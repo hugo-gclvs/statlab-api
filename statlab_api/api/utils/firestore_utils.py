@@ -235,13 +235,11 @@ def get_all_users_by_subject_absences_from_firestore(subject):
 
         # return all users with absences by subject and the number of absences
         return [
-            {
-                'user': db.collection('users').document(user_id).get().to_dict(),
-                'absences_count': absences_count[user_id]
-            }
+            {**db.collection('users').document(user_id).get().to_dict(), 'absences_count': absences_count[user_id]}
             for user_id in absences_count
             if db.collection('users').document(user_id).get().exists
         ]
+
     
     except Exception as e:
         print(f"Error retrieving all users with absences by subject: {e}")
