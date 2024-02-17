@@ -1,6 +1,6 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from .views import LoginView, UserAbsencesView, FilteredAbsencesView, AbsenceStatistiquesView
+from .views import LoginView, UserAbsencesView, FilteredAbsencesView, TopsAbsenceStatistiquesView, AllUsersAbsencesStatistiquesView
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
@@ -26,7 +26,8 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
     path('absences/', UserAbsencesView.as_view(), name='user_absences'),
     path('absences/filtered/', FilteredAbsencesView.as_view(), name='filtered_absences'),
-    path('absences/statistiques/', AbsenceStatistiquesView.as_view(), name='absences_statistiques'),
+    path('absences/statistiques/top/', TopsAbsenceStatistiquesView.as_view(), name='top_absences_statistiques'),
+    path('absences/statistiques/all/', AllUsersAbsencesStatistiquesView.as_view(), name='all_users_absences_statistiques'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 ]

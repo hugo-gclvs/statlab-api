@@ -102,7 +102,6 @@ def get_top_users_with_most_absences_from_firestore(top_n):
         print(f"Error retrieving top n users with most absences: {e}")
         return []
 
-
 def get_top_users_with_most_absences_by_teacher_from_firestore(teacher_name, top_n):
     """
     Retrieve the top n users with the highest number of absences by teacher from Firestore.
@@ -126,7 +125,6 @@ def get_top_users_with_most_absences_by_teacher_from_firestore(teacher_name, top
     except Exception as e:
         print(f"Error retrieving top n users with most absences by teacher: {e}")
 
-
 def get_top_users_with_most_absences_by_classroom_from_firestore(classroom, top_n):
     """
     Retrieve the top n users with the highest number of absences by classroom from Firestore.
@@ -149,7 +147,6 @@ def get_top_users_with_most_absences_by_classroom_from_firestore(classroom, top_
         ]
     except Exception as e:
         print(f"Error retrieving top n users with most absences by classroom: {e}")
-
 
 def get_top_users_with_most_absences_by_subject_from_firestore(subject, top_n):
     """
@@ -197,7 +194,6 @@ def get_top_users_with_most_absences_by_subject_type_from_firestore(subject_type
     except Exception as e:
         print(f"Error retrieving top n users with most absences by subject type: {e}")
 
-
 def get_top_users_with_most_absences_by_justification_from_firestore(justification, top_n):
     """
     Retrieve the top n users with the highest number of absences by justification from Firestore.
@@ -220,6 +216,33 @@ def get_top_users_with_most_absences_by_justification_from_firestore(justificati
         ]
     except Exception as e:
         print(f"Error retrieving top n users with most absences by justification: {e}")
+
+
+def get_all_users_by_subject_absences_from_firestore(subject):
+    """
+    Retrieve all users with absences by subject from Firestore.
+    """
+    try:
+        absences_count = defaultdict(int)
+        absences = db.collection('absences').where(filter=FieldFilter('subject', '==', subject)).stream()
+
+        # count absences for each user by subject and add to the users returned
+
+        for absence in absences:
+            user_ref = absence.to_dict().get('username')
+            if user_ref:
+                absences_count[user_ref.id] += 1
+
+        # return all users with absences by subject and the number of absences
+        return [
+            {**db.collection('users').document(user_id).get().to_dict(), 'absences_count': absences_count[user_id]}
+            for user_id in absences_count
+            if db.collection('users').document(user_id).get().exists
+        ]
+
+    
+    except Exception as e:
+        print(f"Error retrieving all users with absences by subject: {e}")
 
 # Renaming functions for backwards compatibility
 get_user_absences = query_absences
