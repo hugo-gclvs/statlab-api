@@ -206,7 +206,7 @@ class AllUsersAbsencesStatistiquesView(BaseAuthenticatedView):
     def get_all_users_by_subject_absences(self, params):
         subject = params.get('subject')
         users = get_all_users_by_subject_absences_from_firestore(subject)
-        return Response({"users": users})
+        return Response({"users_with_absences_in_specific_subject": users})
 
 class TopsAbsenceStatistiquesView(BaseAuthenticatedView):
     STATISTICS_MAPPING = {

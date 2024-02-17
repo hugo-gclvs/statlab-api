@@ -223,17 +223,23 @@ def get_all_users_by_subject_absences_from_firestore(subject):
     Retrieve all users with absences by subject from Firestore.
     """
     try:
+        absences_count = defaultdict(int)
         absences = db.collection('absences').where(filter=FieldFilter('subject', '==', subject)).stream()
-        user_ids = set()
+
+        # count absences for each user by subject and add to the users returned
 
         for absence in absences:
             user_ref = absence.to_dict().get('username')
             if user_ref:
-                user_ids.add(user_ref.id)
+                absences_count[user_ref.id] += 1
 
+        # return all users with absences by subject and the number of absences
         return [
-            db.collection('users').document(user_id).get().to_dict()
-            for user_id in user_ids
+            {
+                'user': db.collection('users').document(user_id).get().to_dict(),
+                'absences_count': absences_count[user_id]
+            }
+            for user_id in absences_count
             if db.collection('users').document(user_id).get().exists
         ]
     
