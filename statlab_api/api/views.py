@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from .serializers import CustomTokenObtainPairSerializer
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from .utils.firestore_utils import get_top_users_with_most_absences_by_classroom_from_firestore, get_top_users_with_most_absences_by_justification_from_firestore, get_top_users_with_most_absences_by_subject_from_firestore, get_top_users_with_most_absences_by_subject_type_from_firestore, get_top_users_with_most_absences_by_teacher_from_firestore, get_top_users_with_most_absences_from_firestore, get_user_absences, get_filtered_user_absences
+from .utils.firestore_utils import get_top_users_with_most_absences_by_classroom_from_firestore, get_top_users_with_most_absences_by_justification_from_firestore, get_top_users_with_most_absences_by_subject_from_firestore, get_top_users_with_most_absences_by_subject_type_from_firestore, get_top_users_with_most_absences_by_teacher_from_firestore, get_top_users_with_most_absences_from_firestore, get_all_users_by_subject_absences_from_firestore, get_user_absences, get_filtered_user_absences
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
@@ -178,10 +178,37 @@ class FilteredAbsencesView(BaseAuthenticatedView):
             absences = get_filtered_user_absences(user_id, teacher_name, classroom, subjectType, subject, justification)
             return Response({"absences": absences})
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
 
-class AbsenceStatistiquesView(BaseAuthenticatedView):
+class AllUsersAbsencesStatistiquesView(BaseAuthenticatedView):
+    STATISTICS_MAPPING = {
+        'subject': 'get_all_users_by_subject_absences'
+    }
+
+    def get(self, request, *args, **kwargs):
+        try:
+            user_id = self.get_user_id_from_token(request)
+            stat_type = request.query_params.get('type')
+            method_name = self.STATISTICS_MAPPING.get(stat_type)
+
+            if not method_name:
+                return Response({"error": "Invalid type"}, status=status.HTTP_400_BAD_REQUEST)
+
+            return getattr(self, method_name)(request.query_params)
+
+        except Exception as e:
+            return self.handle_error(e)
+        
+    def handle_error(self, exception):
+        logger.error(f"Error in AbsenceStatisticsView: {exception}")
+        return Response({"error": str(exception)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    def get_all_users_by_subject_absences(self, params):
+        subject = params.get('subject')
+        users = get_all_users_by_subject_absences_from_firestore(subject)
+        return Response({"users": users})
+
+class TopsAbsenceStatistiquesView(BaseAuthenticatedView):
     STATISTICS_MAPPING = {
         'global': 'get_top_users_with_most_absences',
         'teacher': 'get_top_users_with_most_absences_by_teacher',
