@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from .serializers import CustomTokenObtainPairSerializer
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from .utils.firestore_utils import get_top_users_with_most_absences_by_classroom_from_firestore, get_top_users_with_most_absences_by_justification_from_firestore, get_top_users_with_most_absences_by_subject_from_firestore, get_top_users_with_most_absences_by_subject_type_from_firestore, get_top_users_with_most_absences_by_teacher_from_firestore, get_top_users_with_most_absences_from_firestore, get_all_users_by_subject_absences_from_firestore, get_user_absences, get_filtered_user_absences, get_all_users_by_classroom_absences_from_firestore
+from .utils.firestore_utils import *
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
@@ -183,7 +183,8 @@ class FilteredAbsencesView(BaseAuthenticatedView):
 class AllUsersAbsencesStatistiquesView(BaseAuthenticatedView):
     STATISTICS_MAPPING = {
         'subject': 'get_all_users_by_subject_absences',
-        'classroom': 'get_all_users_by_classroom_absences'
+        'classroom': 'get_all_users_by_classroom_absences',
+        'subject_type': 'get_all_users_by_subject_type_absences'
     }
 
     @swagger_auto_schema(
@@ -265,6 +266,11 @@ class AllUsersAbsencesStatistiquesView(BaseAuthenticatedView):
         classroom = params.get('classroom')
         users = get_all_users_by_classroom_absences_from_firestore(classroom)
         return Response({"users_with_absences_in_specific_classroom": users})
+    
+    def get_all_users_by_subject_type_absences(self, params):
+        subject_type = params.get('subject_type')
+        users = get_all_users_by_subject_type_absences_from_firestore(subject_type)
+        return Response({"users_with_absences_in_specific_subject_type": users})
 
 class TopsAbsenceStatistiquesView(BaseAuthenticatedView):
     STATISTICS_MAPPING = {
