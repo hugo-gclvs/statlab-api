@@ -244,6 +244,75 @@ def get_all_users_by_subject_absences_from_firestore(subject):
     except Exception as e:
         print(f"Error retrieving all users with absences by subject: {e}")
 
+def get_all_users_by_classroom_absences_from_firestore(classroom):
+    """
+    Retrieve all users with absences by classroom from Firestore.
+    """
+    try:
+        absences_count = defaultdict(int)
+        absences = db.collection('absences').where(filter=FieldFilter('classroom', '==', classroom)).stream()
+
+        # count absences for each user by classroom and add to the users returned
+        for absence in absences:
+            user_ref = absence.to_dict().get('username')
+            if user_ref:
+                absences_count[user_ref.id] += 1
+
+        # return all users with absences by classroom and the number of absences
+        return [
+            {**db.collection('users').document(user_id).get().to_dict(), 'absences_count': absences_count[user_id]}
+            for user_id in absences_count
+            if db.collection('users').document(user_id).get().exists
+        ]
+    except Exception as e:
+        print(f"Error retrieving all users with absences by classroom: {e}")
+
+def get_all_users_by_subject_type_absences_from_firestore(subject_type):
+    """
+    Retrieve all users with absences by subject type from Firestore.
+    """
+    try:
+        absences_count = defaultdict(int)
+        absences = db.collection('absences').where(filter=FieldFilter('subjectType', '==', "/subject_type/"+subject_type)).stream()
+
+        # count absences for each user by subject type and add to the users returned
+        for absence in absences:
+            user_ref = absence.to_dict().get('username')
+            if user_ref:
+                absences_count[user_ref.id] += 1
+
+        # return all users with absences by subject type and the number of absences
+        return [
+            {**db.collection('users').document(user_id).get().to_dict(), 'absences_count': absences_count[user_id]}
+            for user_id in absences_count
+            if db.collection('users').document(user_id).get().exists
+        ]
+    except Exception as e:
+        print(f"Error retrieving all users with absences by subject type: {e}")
+
+def get_all_users_by_teacher_absences_from_firestore(teacher_name):
+    """
+    Retrieve all users with absences by teacher from Firestore.
+    """
+    try:
+        absences_count = defaultdict(int)
+        absences = db.collection('absences').where(filter=FieldFilter('teacher', '==', teacher_name)).stream()
+
+        # count absences for each user by teacher and add to the users returned
+        for absence in absences:
+            user_ref = absence.to_dict().get('username')
+            if user_ref:
+                absences_count[user_ref.id] += 1
+
+        # return all users with absences by teacher and the number of absences
+        return [
+            {**db.collection('users').document(user_id).get().to_dict(), 'absences_count': absences_count[user_id]}
+            for user_id in absences_count
+            if db.collection('users').document(user_id).get().exists
+        ]
+    except Exception as e:
+        print(f"Error retrieving all users with absences by teacher: {e}")
+
 # Renaming functions for backwards compatibility
 get_user_absences = query_absences
 get_filtered_user_absences = query_absences
