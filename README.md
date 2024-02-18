@@ -155,7 +155,7 @@ This document outlines the endpoints provided by our OGE API, which is designed 
 ### All Absence Statistics Retrieval
 - **Endpoint**: `GET /absence/statistiques/all/`
 - **Purpose**: Provides the users with absences in a specific type of absences.
-- **Parameters**: Required - `type`; Optional - `subject`.
+- **Parameters**: Required - `type`; Optional - `subject`, `teacher`, `classroom`, `subject_type`.
 - **Headers**: Requires `Authorization` bearer token.
 - **Response Examples**:
   - **200 OK**: 

@@ -189,11 +189,14 @@ class AllUsersAbsencesStatistiquesView(BaseAuthenticatedView):
     }
 
     @swagger_auto_schema(
-        operation_description="Returns the users with absences in a specific type of absences. \"Type\" is not optional and must be one of the following: subject. Other parameters depend on the type.",
+        operation_description="Returns the users with absences in a specific type of absences. \"Type\" is not optional and must be one of the following: subject, classroom, subject_type, teacher. Other parameters depend on the type.",
         manual_parameters=[
             token_param,
             openapi.Parameter('type', openapi.IN_QUERY, description="Statistiques type", type=openapi.TYPE_STRING, required=True),
             openapi.Parameter('subject', openapi.IN_QUERY, description="Subject name", type=openapi.TYPE_STRING),
+            openapi.Parameter('classroom', openapi.IN_QUERY, description="Classroom name", type=openapi.TYPE_STRING),
+            openapi.Parameter('subject_type', openapi.IN_QUERY, description="Subject type", type=openapi.TYPE_STRING),
+            openapi.Parameter('teacher', openapi.IN_QUERY, description="Teacher name", type=openapi.TYPE_STRING),
         ],
         responses={
             200: openapi.Response(
