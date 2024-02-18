@@ -6,7 +6,7 @@ This document outlines the endpoints provided by our OGE API, which is designed 
 ## Authentication
 
 ### Login
-- **Endpoint**: `POST /login`
+- **Endpoint**: `POST /login/`
 - **Purpose**: Authenticates a user and returns a JWT token along with user info.
 - **Request Body Example**:
   ```json
@@ -44,7 +44,7 @@ This document outlines the endpoints provided by our OGE API, which is designed 
 ## User Absences
 
 ### User Absences Retrieval
-- **Endpoint**: `GET /user-absences`
+- **Endpoint**: `GET /absences/`
 - **Purpose**: Retrieves authenticated user's absences.
 - **Headers**: Requires `Authorization` bearer token.
 - **Response Examples**:
@@ -75,7 +75,7 @@ This document outlines the endpoints provided by our OGE API, which is designed 
     ```
 
 ### Filtered User Absences
-- **Endpoint**: `GET /filtered-absences`
+- **Endpoint**: `GET /absences/filtered/`
 - **Purpose**: Returns filtered absences of the user.
 - **Parameters**: Optional - `teacher`, `classroom`, `subjectType`, `subject`, `justification`.
 - **Headers**: Requires `Authorization` bearer token.
@@ -106,10 +106,10 @@ This document outlines the endpoints provided by our OGE API, which is designed 
     }
     ```
 
-## Absence Statistics
+## Top Absence Statistics
 
-### Absence Statistics Retrieval
-- **Endpoint**: `GET /absence-statistics`
+### Top Absence Statistics Retrieval
+- **Endpoint**: `GET /absence/statistiques/top/`
 - **Purpose**: Provides top n users with most absences based on criteria.
 - **Parameters**: Required - `type`; Optional - `top_n`, `teacher`, `classroom`, `subject`, `subject_type`, `justification`.
 - **Headers**: Requires `Authorization` bearer token.
@@ -118,6 +118,50 @@ This document outlines the endpoints provided by our OGE API, which is designed 
     ```json
     {
       "top_n_global_ranking": [
+        {
+          "username": "username",
+          "first_name": "first_name",
+          "last_name": "last_name",
+          "specialization": "specialization",
+          "study_year": "study_year",
+          "absences_count": 10
+        },
+        {
+          "username": "username2",
+          "first_name": "first_name2",
+          "last_name": "last_name2",
+          "specialization": "specialization2",
+          "study_year": "study_year2",
+          "absences_count": 4
+        }
+      ]
+    }
+    ```
+  - **400 Bad Request**: 
+    ```json
+    {
+      "error": "Invalid type"
+    }
+    ```
+  - **500 Internal Server Error**: 
+    ```json
+    {
+      "error": "Error message"
+    }
+    ```
+
+## All Absence Statistics
+
+### All Absence Statistics Retrieval
+- **Endpoint**: `GET /absence/statistiques/all/`
+- **Purpose**: Provides the users with absences in a specific type of absences.
+- **Parameters**: Required - `type`; Optional - `subject`.
+- **Headers**: Requires `Authorization` bearer token.
+- **Response Examples**:
+  - **200 OK**: 
+    ```json
+    {
+      "users_with_absences_in_specific_subject": [
         {
           "username": "username",
           "first_name": "first_name",
