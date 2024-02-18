@@ -184,7 +184,8 @@ class AllUsersAbsencesStatistiquesView(BaseAuthenticatedView):
     STATISTICS_MAPPING = {
         'subject': 'get_all_users_by_subject_absences',
         'classroom': 'get_all_users_by_classroom_absences',
-        'subject_type': 'get_all_users_by_subject_type_absences'
+        'subject_type': 'get_all_users_by_subject_type_absences',
+        'teacher': 'get_all_users_by_teacher_absences',
     }
 
     @swagger_auto_schema(
@@ -271,6 +272,11 @@ class AllUsersAbsencesStatistiquesView(BaseAuthenticatedView):
         subject_type = params.get('subject_type')
         users = get_all_users_by_subject_type_absences_from_firestore(subject_type)
         return Response({"users_with_absences_in_specific_subject_type": users})
+    
+    def get_all_users_by_teacher_absences(self, params):
+        teacher_name = params.get('teacher')
+        users = get_all_users_by_teacher_absences_from_firestore(teacher_name)
+        return Response({"users_with_absences_in_specific_teacher": users})
 
 class TopsAbsenceStatistiquesView(BaseAuthenticatedView):
     STATISTICS_MAPPING = {
