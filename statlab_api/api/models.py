@@ -1,11 +1,11 @@
 from django.db import models
 
 class User(models.Model):
-    username = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    first_name = models.CharField(max_length=100)
-    specialization = models.CharField(max_length=100)
-    study_year = models.CharField(max_length=100)
+    username = models.CharField(max_length=100, null=True)
+    last_name = models.CharField(max_length=100, null=True)
+    first_name = models.CharField(max_length=100, null=True)
+    specialization = models.CharField(max_length=100, null=True)
+    study_year = models.CharField(max_length=100, null=True)
 
     def to_dict(self):
         return {
